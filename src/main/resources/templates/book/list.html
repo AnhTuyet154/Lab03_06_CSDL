@@ -1,14 +1,16 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecuriry4">
 <head>
+  <script src="/static/js/list.js"></script>
   <meta charset="UTF-8">
   <title>My Book List</title>
   <th:block th:replace="~{layout :: link-css}"></th:block>
 </head>
 <body>
 <th:block th:replace="~{layout :: header}"></th:block>
-<div class="container">
-  <h1 th:text="${title}"></h1>
+<div class="container"><!--
+  <h1 th:text="${title}"></h1>-->
   <table class="table">
     <tr>
       <th>ID</th>
@@ -16,22 +18,43 @@
       <th>Author</th>
       <th>Price</th>
       <th>Category</th>
-      <th>Action</th>
+      <th sec:authorize="hasAnyAuthority('ADMIN')">Action</th>
     </tr>
+    <!--    <tbody id="book-table-body"></tbody>-->
     <tr th:each="book : ${books}">
       <td th:text="${book.id}"></td>
       <td th:text="${book.title}"></td>
       <td th:text="${book.author}"></td>
       <td th:text="${book.price}"></td>
       <td th:text="${book.category.name}"></td>
-      <td>
-        <a th:href="@{/books/edit/{id} (id=${book.id})}">Edit</a>
-        <a th:href="@{/books/delete/{id} (id=${book.id})}"
-           onclick="return confirm('Are you sure?')">Delete</a>
+      <td sec:authorize="hasAnyAuthority('ADMIN')">
+        <a th:href="@{/books/edit/{id}(id=${book.id})}">Edit</a>
+        <a th:href="@{/books/delete/{id}(id=${book.id})}"
+           onclick="deleteBook(this);" class="text-danger">Delete</a>
       </td>
     </tr>
   </table>
 </div>
+<script th:src="@{/js/jquery-3.6.4.min.js}"></script>
+<script th:inline="javascript">
+  function deleteBook(link) {
+  var confirmation = confirm('Are you sure?');
+  if (confirmation) {
+    $.ajax({
+      url: $(link).attr('href'),
+      type: 'DELETE',
+      success: function(result) {
+        if (!result.success) {
+          alert(result.message);
+        } else {
+          $(link).parent().parent().remove();
+        }
+      }
+    });
+  }
+}
+
+</script>
 <th:block th:replace="~{layout :: footer}"></th:block>
 </body>
 </html>

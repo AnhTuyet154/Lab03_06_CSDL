@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecuriry4">
 <head>
   <meta charset="UTF-8">
   <title>My Category List</title>
@@ -13,11 +14,12 @@
     <tr>
       <th>ID</th>
       <th>Name</th>
+      <th sec:authorize="hasAnyAuthority('ADMIN')">Action</th>
     </tr>
     <tr th:each="category : ${categories}">
       <td th:text="${category.id}"></td>
       <td th:text="${category.name}"></td>
-      <td>
+      <td sec:authorize="hasAnyAuthority('ADMIN')">
         <a th:href="@{/categories/edit/{id} (id=${category.id})}">Edit</a>
         <a th:href="@{/categories/delete/{id} (id=${category.id})}"
            onclick="return confirm('Are you sure?')">Delete</a>
